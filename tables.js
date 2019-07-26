@@ -82,6 +82,7 @@ function doClick() {
 		var game = JSON.parse(LZString.decompressFromBase64(foo.value));
     console.log(foo.value);
     console.log(game);
+    foo.value = "";
     
     var hasMesmer = game.talents.mesmer.purchased;
     var HZReached = game.global.highestLevelCleared+1;
