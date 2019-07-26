@@ -57,6 +57,25 @@ body
   font-weight: bold;
 }
 
+.datagridCell
+{
+  color: #DEF2F1;
+  border-left: 1px solid #2B7A78;
+  border-bottom: 1px solid #2B7A78;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.datagridCellAlt
+{
+  background: #161a28;
+  color: #DEF2F1;
+  border-left: 1px solid #2B7A78;
+  border-bottom: 1px solid #2B7A78;
+  font-size: 14px;
+  font-weight: bold;
+}
+
 .datagrid table tbody .alt td 
 {
   background: #161a28;
