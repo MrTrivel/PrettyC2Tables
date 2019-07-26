@@ -99,7 +99,6 @@ function doClick() {
     if(HZReached >= 425) specialC2s.push("Obliterated");
     if(totalC2 >= 4500) specialC2s.push("Eradicated");
     
-    var C2Table = "";
     for (var i = 0; i < easyC2.length; i++) {
      var key = easyC2[i];
      var isAlt = i%2;
@@ -113,7 +112,7 @@ function doClick() {
      
      if (game['c2'][key] !== undefined)
      {
-     		var className = isAlt==1?"datagridCellAlt":"datagridCell";
+     		var className = isAlt==1?"alt":"";
      		cellChallenge.innerHTML = easyC2[i];
      cellChallenge.className = className;
         cellHZE.innerHTML = game['c2'][key];
@@ -135,13 +134,13 @@ function doClick() {
      if (game['c2'][key2] !== undefined)
      {
      
-     		var className = isAlt2==1?"datagridCellAlt":"datagridCell";
+     		var className = isAlt2==1?"alt":"";
      		cellChallenge2.innerHTML = easyC2[j];
      cellChallenge2.className = className;
         cellHZE2.innerHTML = game['c2'][key2];
      cellHZE2.className = className;
         cellC2Percent2.innerHTML = getBasicC2(game['c2'][key2], hasMesmer, specialC2s[j]) + "%";
-     cellC2Percent2.className = className;
+		cellC2Percent2.className = className;
      }
     }
     
@@ -151,7 +150,7 @@ function doClick() {
     var cellC2PercentT = rowTotal.insertCell(2);
     
     var isAlt3 = (i+j)%2;
-     		var className = isAlt3==1?"datagridCellAlt":"datagridCell";
+     		var className = isAlt3==1?"alt":"";
     
     cellTotal.innerHTML = "Total:";
     cellC2PercentT.innerHTML = totalC2 + "%";
