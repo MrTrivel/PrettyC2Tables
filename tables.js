@@ -99,26 +99,64 @@ function doClick() {
     if(HZReached >= 425) specialC2s.push("Obliterated");
     if(totalC2 >= 4500) specialC2s.push("Eradicated");
     
-    var C2Table = "<thead><tr><th>Challenge</th><th>HZE</th><th>C2%</th></tr></thead>";
+    var C2Table = "";
     for (var i = 0; i < easyC2.length; i++) {
      var key = easyC2[i];
      var isAlt = i%2;
-     var rowHTML = "<tr><td>";
-     if (isAlt == 1) rowHTML = '<tr class="alt"><td>'; 
-     if (game['c2'][key] !== undefined) 
-       C2Table += rowHTML + easyC2[i]+ "</td><td>" + game['c2'][key] + "</td><td>" + getBasicC2(game['c2'][key], hasMesmer) + "%</td></tr>";
+     
+     var row = table.insertRow(-1);
+     
+     var cellChallenge = row.insertCell(0);
+     var cellHZE = row.insertCell(1);
+     var cellC2Percent = row.insertCell(2);
+     
+     
+     if (game['c2'][key] !== undefined)
+     {
+     		var className = isAlt==1?"datagridCellAlt":"datagridCell";
+     		cellChallenge.innerHTML = easyC2[i];
+     cellChallenge.className = className;
+        cellHZE.innerHTML = game['c2'][key];
+     cellHZE.className = className;
+        cellC2Percent.innerHTML = getBasicC2(game['c2'][key], hasMesmer) + "%";
+     cellC2Percent.className =className;
+     }
       
     }
     for (var j = 0; j < specialC2s.length; j++) {
      var key2 = specialC2s[j];
      var isAlt2 = (i+j)%2;
-     var rowHTML2 = "<tr><td>";
-     if (isAlt2 == 1) rowHTML2 = '<tr class="alt"><td>'; 
+     
+     var row2 = table.insertRow(-1);
+     var cellChallenge2 = row2.insertCell(0);
+     var cellHZE2 = row2.insertCell(1);
+     var cellC2Percent2 = row2.insertCell(2);
+     
      if (game['c2'][key2] !== undefined)
-     	 C2Table += rowHTML2 + specialC2s[j]+ "</td><td>" + game['c2'][key2]   + "</td><td>" + getBasicC2(game['c2'][key2], hasMesmer, specialC2s[j]) + "%</td></tr>";
+     {
+     
+     		var className = isAlt2==1?"datagridCellAlt":"datagridCell";
+     		cellChallenge2.innerHTML = easyC2[j];
+     cellChallenge2.className = className;
+        cellHZE2.innerHTML = game['c2'][key2];
+     cellHZE2.className = className;
+        cellC2Percent2.innerHTML = getBasicC2(game['c2'][key2], hasMesmer, specialC2s[j]) + "%";
+     cellC2Percent2.className = className;
+     }
     }
     
-    C2Table += '<tr class="total"><td>Total:</td><td></td><td>' + totalC2 + '%</td></tr>';
-    table.append(C2Table);
+    var rowTotal = table.insertRow(-1);
+    var cellTotal = rowTotal.insertCell(0);
+    var cellBlank = rowTotal.insertCell(1);
+    var cellC2PercentT = rowTotal.insertCell(2);
+    
+    var isAlt3 = (i+j)%2;
+     		var className = isAlt3==1?"datagridCellAlt":"datagridCell";
+    
+    cellTotal.innerHTML = "Total:";
+    cellC2PercentT.innerHTML = totalC2 + "%";
+     cellTotal.className = className;
+     cellBlank.className = className;
+     cellC2PercentT.className = className;
 };
 
