@@ -73,8 +73,11 @@ function getBasicC2(HZE, isMesmer, challenge = "standard") {
 
 function doClick() {
     var foo = document.getElementById("foo");
+    if (foo.value == "") return;
+    
     var result = document.getElementById("result");
     var table = document.getElementById("c2table");
+    table.innerHTML = "";
     
     var easyC2 = ["Discipline", "Metal", "Size", "Balance", "Meditate"];
     var specialC2s = ["Trimp"];
