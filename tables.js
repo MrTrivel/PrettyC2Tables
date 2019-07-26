@@ -139,7 +139,7 @@ function doClick() {
      {
      
      		var className = isAlt2==1?"alt":"";
-     		cellChallenge2.innerHTML = easyC2[j];
+     		cellChallenge2.innerHTML = specialC2s[j];
      cellChallenge2.className = className;
         cellHZE2.innerHTML = game['c2'][key2];
      cellHZE2.className = className;
