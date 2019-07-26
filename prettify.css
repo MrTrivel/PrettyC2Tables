@@ -76,7 +76,7 @@ body
   font-weight: bold;
 }
 
-.datagrid table tbody .alt td 
+.datagrid table tbody tr .alt 
 {
   background: #161a28;
   color: #DEF2F1;
