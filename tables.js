@@ -63,12 +63,29 @@ function getBasicC2(HZE, isMesmer, challenge = "standard") {
   
   for (i = 0; i < Math.floor(HZE/zonesForBonus); i++)
   {
-  	currentZone += zonesForBonus;
-    currentPercent += currentBonus;
+    currentZone += zonesForBonus;
+    
+  	var zonesAffected = currentZone - 701;
+    var weirdBonus = 0;
+    if (zonesAffected > 0 && zonesAffected < zonesForBonus)
+    {
+    	weirdBonus = 	Math.floor((currentBonus * (zonesForBonus-zonesAffected) + 
+      							currentBonus * 5 * zonesAffected) / zonesForBonus);
+    }
+    
+    
+    currentPercent += weirdBonus > 0 ? weirdBonus : currentBonus * (currentZone > 701 ? 5 : 1);  
     if (currentZone%zonesForBonusIncrease == 0) currentBonus += bonusIncrease;
   }
     
 	return currentPercent;
+}
+
+
+function getC2HZE(radiumHZE = 0){
+	var zone = 701;
+	zone += (radiumHZE > 100) ? 100 + (Math.floor(radiumHZE / 50) * 10) : Math.floor(radiumHZE / 10) * 10;
+	return zone;
 }
 
 function doClick() {
@@ -83,12 +100,11 @@ function doClick() {
     var specialC2s = ["Trimp"];
     
 		var game = JSON.parse(LZString.decompressFromBase64(foo.value));
-    console.log(foo.value);
-    console.log(game);
     foo.value = "";
     
     var hasMesmer = game.talents.mesmer.purchased;
     var HZReached = game.global.highestLevelCleared+1;
+    var radHZReached = game.global.highestRadonLevelCleared;
     var prisonClear = game.global.prisonClear;
     var totalC2 = game.global.totalSquaredReward;
     
@@ -116,12 +132,13 @@ function doClick() {
      
      if (game['c2'][key] !== undefined)
      {
+     var c2HZE = Math.min(game['c2'][key], getC2HZE(radHZReached));
      		var className = isAlt==1?"alt":"";
      		cellChallenge.innerHTML = easyC2[i];
      cellChallenge.className = className;
-        cellHZE.innerHTML = game['c2'][key];
+        cellHZE.innerHTML = c2HZE;
      cellHZE.className = className;
-        cellC2Percent.innerHTML = getBasicC2(game['c2'][key], hasMesmer) + "%";
+        cellC2Percent.innerHTML = getBasicC2(c2HZE, hasMesmer) + "%";
      cellC2Percent.className =className;
      }
       
@@ -137,12 +154,13 @@ function doClick() {
      
      if (game['c2'][key2] !== undefined)
      {
-     
+     var c2HZE = Math.min(game['c2'][key2], getC2HZE(radHZReached));
      		var className = isAlt2==1?"alt":"";
      		cellChallenge2.innerHTML = specialC2s[j];
      cellChallenge2.className = className;
-        cellHZE2.innerHTML = game['c2'][key2];
+        cellHZE2.innerHTML = c2HZE;
      cellHZE2.className = className;
+     var c2HZE = Math.min(game['c2'][key2], getC2HZE());
         cellC2Percent2.innerHTML = getBasicC2(game['c2'][key2], hasMesmer, specialC2s[j]) + "%";
 		cellC2Percent2.className = className;
      }
