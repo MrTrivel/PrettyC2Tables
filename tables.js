@@ -1,183 +1,180 @@
-function getBasicC2(HZE, isMesmer, challenge = "standard") {
-  
+// Global variables
+var gSaveString;
+var gTable;
+var gTableRows;
+
+// Hardcoded data
+var altClassName = "alt";
+
+function doClick() {
+  // Set the variables
+  gTable = document.getElementById("c2table");
+  gSaveString = document.getElementById("saveString");
+
+  // If savestring is blank, do nothing
+  if (gSaveString.value == "") return;
+
+  // Remove all the rows in the table
+  clearTable();
+
+  // Try to parse the save string
+  var game;
+  try {
+    game = JSON.parse(LZString.decompressFromBase64(saveString.value));
+  } catch(err) {}
+
+  // If the data couldn't be parsed due to it not being a save string, throw errors
+  if (game == null || game.talents == undefined) {
+    addRowToTable(["Not a Trimps", "save", "string."])
+    gSaveString.value = "";
+    return;
+  }
+
+  // Game data needed for unlocks and calculations
+  var hasMesmer = game.talents.mesmer.purchased;
+  var HZReached = game.global.highestLevelCleared+1;
+  var radHZReached = game.global.highestRadonLevelCleared;
+  var prisonClear = game.global.prisonClear;
+  var totalC2 = game.global.totalSquaredReward;
+
+  console.log(prisonClear);
+
+  // Initialize default challenges that are already available when unlocking C2
+  var challenges = ["Discipline", "Metal", "Size", "Balance", "Meditate"];
+
+  // Check if there are more basic C2s unlocked
+  if (prisonClear >= 1) challenges.push("Electricity");
+  if(HZReached >= 130) challenges.push("Slow");
+  if(HZReached >= 145) challenges.push("Nom");
+  if(HZReached >= 150) challenges.push("Mapology");
+  if(HZReached >= 165) challenges.push("Toxicity");
+  if(HZReached >= 180) { challenges.push("Watch"); challenges.push("Lead"); }
+  if(HZReached >= 70) challenges.push("Trapper");
+
+  // Check if there are more special C2s unlocked
+  challenges.push("Trimp"); // Already unlocked when having C2s unlocked
+  if(HZReached >= 120) challenges.push("Coordinate");
+  if(HZReached >= 425) challenges.push("Obliterated");
+  if(totalC2 >= 4500) challenges.push("Eradicated");
+
+  for (var i = 0 ; i < challenges.length ; i++)
+  {
+    var challenge = challenges[i];
+    if (game.c2[challenge] == "undefined") continue;
+
+    var challengeZone = Math.min(game.c2[challenge], getC2HZE(radHZReached))
+    var percent = getC2Percent(challenge, challengeZone, hasMesmer);
+
+    addRowToTable([challenge, challengeZone, percent + "%"]);
+  }
+
+  addRowToTable(["Total:", "", totalC2 + "%"]);
+};
+
+function getC2Percent(challenge, HZE, isMesmer) {
+
   var zonesForBonus = 0; // zones needed for percentage increase
-	var currentBonus = 0; // current percentage increases by
-  
+  var currentBonus = 0; // current percentage increases by
+
   var zonesForBonusIncrease = 0; // zones needed for bonus increase
   var bonusIncrease = 0; // bonus increases by how much
-  
+
   var currentZone = 0; // current zone
   var currentPercent = 0; // current C2 percentage
-  
+
   switch (challenge)
   {
-  	case "standard":
-    {
-    	zonesForBonus = 10;
-      zonesForBonusIncrease = 100;
-      bonusIncrease = isMesmer?3:1;
-      currentBonus = isMesmer?3:1;
-      break;
-    }
-  	case "Trimp":
-    {
-    	zonesForBonus = 10;
+    case "Trimp":
+      zonesForBonus = 10;
       zonesForBonusIncrease = 40;
       bonusIncrease = 3;
       currentBonus = 3;
       break;
-    }
-  	case "Trapper":
-    {
-    	zonesForBonus = 10;
+
+    case "Trapper":
+      zonesForBonus = 10;
       zonesForBonusIncrease = 50;
       bonusIncrease = 2;
       currentBonus = 1;
       break;
-    }
-  	case "Coordinate":
-    {
-    	zonesForBonus = 3;
+
+    case "Coordinate":
+      zonesForBonus = 3;
       zonesForBonusIncrease = 30;
       bonusIncrease = 1;
       currentBonus = 1;
       break;
-    }
-  	case "Obliterated":
-    {
-    	zonesForBonus = 1;
+
+    case "Obliterated":
+      zonesForBonus = 1;
       zonesForBonusIncrease = 10;
       bonusIncrease = 1;
       currentBonus = 1;
       break;
-    }
-  	case "Eradicated":
-    {
-    	zonesForBonus = 1;
+
+    case "Eradicated":
+      zonesForBonus = 1;
       zonesForBonusIncrease = 2;
       bonusIncrease = 2;
       currentBonus = 10;
       break;
-    }
+
+    default:
+      zonesForBonus = 10;
+      zonesForBonusIncrease = 100;
+      bonusIncrease = isMesmer?3:1;
+      currentBonus = isMesmer?3:1;
+      break;
   }
-  
+
   for (i = 0; i < Math.floor(HZE/zonesForBonus); i++)
   {
     currentZone += zonesForBonus;
-    
-  	var zonesAffected = currentZone - 701;
+
+    var zonesAffected = currentZone - 701;
     var weirdBonus = 0;
     if (zonesAffected > 0 && zonesAffected < zonesForBonus)
     {
-    	weirdBonus = 	Math.floor((currentBonus * (zonesForBonus-zonesAffected) + 
-      							currentBonus * 5 * zonesAffected) / zonesForBonus);
+      weirdBonus = 	Math.floor((currentBonus * (zonesForBonus-zonesAffected) +
+      currentBonus * 5 * zonesAffected) / zonesForBonus);
     }
-    
-    
-    currentPercent += weirdBonus > 0 ? weirdBonus : currentBonus * (currentZone > 701 ? 5 : 1);  
+
+
+    currentPercent += weirdBonus > 0 ? weirdBonus : currentBonus * (currentZone > 701 ? 5 : 1);
     if (currentZone%zonesForBonusIncrease == 0) currentBonus += bonusIncrease;
   }
-    
-	return currentPercent;
+
+  return currentPercent;
 }
 
 
 function getC2HZE(radiumHZE = 0){
-	var zone = 701;
-	zone += (radiumHZE > 100) ? 100 + (Math.floor(radiumHZE / 50) * 10) : Math.floor(radiumHZE / 10) * 10;
-	return zone;
+  var zone = 701;
+  zone += (radiumHZE > 100) ? 100 + (Math.floor(radiumHZE / 50) * 10) : Math.floor(radiumHZE / 10) * 10;
+  return zone;
 }
 
-function doClick() {
-    var foo = document.getElementById("foo");
-    if (foo.value == "") return;
-    
-    var result = document.getElementById("result");
-    var table = document.getElementById("c2table");
-    table.innerHTML = "";
-    
-    var easyC2 = ["Discipline", "Metal", "Size", "Balance", "Meditate"];
-    var specialC2s = ["Trimp"];
-    
-		var game = JSON.parse(LZString.decompressFromBase64(foo.value));
-    foo.value = "";
-    
-    var hasMesmer = game.talents.mesmer.purchased;
-    var HZReached = game.global.highestLevelCleared+1;
-    var radHZReached = game.global.highestRadonLevelCleared;
-    var prisonClear = game.global.prisonClear;
-    var totalC2 = game.global.totalSquaredReward;
-    
-    if(HZReached >= 70) specialC2s.push("Trapper");
-    if (prisonClear == 1) easyC2.push("Electricity");
-    if(HZReached >= 120) specialC2s.push("Coordinate");
-    if(HZReached >= 130) easyC2.push("Slow");
-    if(HZReached >= 145) easyC2.push("Nom");
-    if(HZReached >= 150) easyC2.push("Mapology");
-    if(HZReached >= 165) easyC2.push("Toxicity");
-    if(HZReached >= 180) { easyC2.push("Watch"); easyC2.push("Lead"); }
-    if(HZReached >= 425) specialC2s.push("Obliterated");
-    if(totalC2 >= 4500) specialC2s.push("Eradicated");
-    
-    for (var i = 0; i < easyC2.length; i++) {
-     var key = easyC2[i];
-     var isAlt = i%2;
-     
-     var row = table.insertRow(-1);
-     
-     var cellChallenge = row.insertCell(0);
-     var cellHZE = row.insertCell(1);
-     var cellC2Percent = row.insertCell(2);
-     
-     
-     if (game['c2'][key] !== undefined)
-     {
-     var c2HZE = Math.min(game['c2'][key], getC2HZE(radHZReached));
-     		var className = isAlt==1?"alt":"";
-     		cellChallenge.innerHTML = easyC2[i];
-     cellChallenge.className = className;
-        cellHZE.innerHTML = c2HZE;
-     cellHZE.className = className;
-        cellC2Percent.innerHTML = getBasicC2(c2HZE, hasMesmer) + "%";
-     cellC2Percent.className =className;
-     }
-      
-    }
-    for (var j = 0; j < specialC2s.length; j++) {
-     var key2 = specialC2s[j];
-     var isAlt2 = (i+j)%2;
-     
-     var row2 = table.insertRow(-1);
-     var cellChallenge2 = row2.insertCell(0);
-     var cellHZE2 = row2.insertCell(1);
-     var cellC2Percent2 = row2.insertCell(2);
-     
-     if (game['c2'][key2] !== undefined)
-     {
-     var c2HZE = Math.min(game['c2'][key2], getC2HZE(radHZReached));
-     		var className = isAlt2==1?"alt":"";
-     		cellChallenge2.innerHTML = specialC2s[j];
-     cellChallenge2.className = className;
-        cellHZE2.innerHTML = c2HZE;
-     cellHZE2.className = className;
-     var c2HZE = Math.min(game['c2'][key2], getC2HZE());
-        cellC2Percent2.innerHTML = getBasicC2(game['c2'][key2], hasMesmer, specialC2s[j]) + "%";
-		cellC2Percent2.className = className;
-     }
-    }
-    
-    var rowTotal = table.insertRow(-1);
-    var cellTotal = rowTotal.insertCell(0);
-    var cellBlank = rowTotal.insertCell(1);
-    var cellC2PercentT = rowTotal.insertCell(2);
-    
-    var isAlt3 = (i+j)%2;
-     		var className = isAlt3==1?"alt":"";
-    
-    cellTotal.innerHTML = "Total:";
-    cellC2PercentT.innerHTML = totalC2 + "%";
-     cellTotal.className = className;
-     cellBlank.className = className;
-     cellC2PercentT.className = className;
-};
+function clearTable()
+{
+  gTable.innerHTML = "";
+  gTableRows = 0;
+}
 
+function addCellToRow(row, text, i, className)
+{
+  var cell = row.insertCell(i);
+  cell.innerHTML = text;
+  cell.className = className;
+}
+
+function addRowToTable(data)
+{
+  var row = gTable.insertRow(-1);
+
+  gTableRows++;
+
+  for (var i = 0; i < data.length; i++)
+  {
+    addCellToRow(row, data[i], i, gTableRows % 2 == 0 ? altClassName : "");
+  }
+}
