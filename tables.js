@@ -21,6 +21,7 @@ function doClick() {
   var game;
   try {
     game = JSON.parse(LZString.decompressFromBase64(saveString.value));
+    gSaveString.value = "";
   } catch(err) {}
 
   // If the data couldn't be parsed due to it not being a save string, throw errors
