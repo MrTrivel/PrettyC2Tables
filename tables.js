@@ -6,10 +6,16 @@ var gTableRows;
 // Hardcoded data
 var altClassName = "alt";
 
-function doClick() {
-  // Set the variables
+function initializeGlobalVariables()
+{
   gTable = document.getElementById("c2table");
   gSaveString = document.getElementById("saveString");
+}
+
+
+function doClick() {
+
+  initializeGlobalVariables();
 
   // If savestring is blank, do nothing
   if (gSaveString.value == "") return;
@@ -36,39 +42,66 @@ function doClick() {
   var prisonClear = game.global.prisonClear;
   var totalC2 = game.global.totalSquaredReward;
 
-  console.log(prisonClear);
+  // Check if C2s are even unlocked
+  if (HZReached < 65)
+  {
+    addRowToTable(["C<sup>2</sup> has not", "been", "unlocked."]);
+    return;
+  }
 
-  // Initialize default challenges that are already available when unlocking C2
-  var challenges = ["Discipline", "Metal", "Size", "Balance", "Meditate"];
+  // Initialize default challenges that are already available when unlocking C2 or C3
+  var challengesU1 = ["Discipline", "Metal", "Size", "Balance", "Meditate"];
+  var challengesU2 = ["Unlucky", "Downsize", "Transmute", "Unbalance", "Duel", "Trappapalooza"];
 
   // Check if there are more basic C2s unlocked
-  if (prisonClear >= 1) challenges.push("Electricity");
-  if(HZReached >= 130) challenges.push("Slow");
-  if(HZReached >= 145) challenges.push("Nom");
-  if(HZReached >= 150) challenges.push("Mapology");
-  if(HZReached >= 165) challenges.push("Toxicity");
-  if(HZReached >= 180) { challenges.push("Watch"); challenges.push("Lead"); }
-  if(HZReached >= 70) challenges.push("Trapper");
+  if (prisonClear >= 1) challengesU1.push("Electricity");
+  if(HZReached >= 130) challengesU1.push("Slow");
+  if(HZReached >= 145) challengesU1.push("Nom");
+  if(HZReached >= 150) challengesU1.push("Mapology");
+  if(HZReached >= 165) challengesU1.push("Toxicity");
+  if(HZReached >= 180) { challengesU1.push("Watch"); challengesU1.push("Lead"); }
+  if(HZReached >= 70) challengesU1.push("Trapper");
 
   // Check if there are more special C2s unlocked
-  challenges.push("Trimp"); // Already unlocked when having C2s unlocked
-  if(HZReached >= 120) challenges.push("Coordinate");
-  if(HZReached >= 425) challenges.push("Obliterated");
-  if(totalC2 >= 4500) challenges.push("Eradicated");
+  challengesU1.push("Trimp"); // Already unlocked when having C2s unlocked
+  if(HZReached >= 120) challengesU1.push("Coordinate");
+  if(HZReached >= 425) challengesU1.push("Obliterated");
+  if(totalC2 >= 4500) challengesU1.push("Eradicated");
 
-  for (var i = 0 ; i < challenges.length ; i++)
+  // Check if there are more C3s unlocked
+  if(radHZReached >= 69) challengesU2.push("Wither");
+  if(radHZReached >= 84) challengesU2.push("Quest");
+
+
+  // Calculate and add them to the table
+  var c2Percent = calcChallenges(game, challengesU1, hasMesmer, radHZReached);
+  addRowToTable(["Total C<sup>2</sup>:", "", c2Percent + "%"]);
+
+  if (radHZReached >= 64)
   {
-    var challenge = challenges[i];
+    var c3Percent = calcChallenges(game, challengesU2, hasMesmer, radHZReached);
+    addRowToTable(["Total C<sup>3</sup>:", "", c3Percent + "%"]);
+    addRowToTable(["Total C<sup>∞</sup>:", "", Math.round(totalC2) + "%"]);
+  }
+};
+
+function calcChallenges(game, challengeData, hasMesmer, radHZReached)
+{
+  var totalC2Percent = 0;
+  for (var i = 0 ; i < challengeData.length ; i++)
+  {
+    var challenge = challengeData[i];
     if (game.c2[challenge] == "undefined") continue;
 
     var challengeZone = Math.min(game.c2[challenge], getC2HZE(radHZReached))
     var percent = getC2Percent(challenge, challengeZone, hasMesmer);
 
+    totalC2Percent += percent;
+
     addRowToTable([challenge, challengeZone, percent + "%"]);
   }
-
-  addRowToTable(["Total:", "", totalC2 + "%"]);
-};
+  return totalC2Percent;
+}
 
 function getC2Percent(challenge, HZE, isMesmer) {
 
@@ -83,6 +116,7 @@ function getC2Percent(challenge, HZE, isMesmer) {
 
   switch (challenge)
   {
+    // U1 Cases
     case "Trimp":
       zonesForBonus = 10;
       zonesForBonusIncrease = 40;
@@ -116,6 +150,14 @@ function getC2Percent(challenge, HZE, isMesmer) {
       zonesForBonusIncrease = 2;
       bonusIncrease = 2;
       currentBonus = 10;
+      break;
+
+    // U2 Cases
+    case "Trappapalooza":
+      zonesForBonus = 10;
+      zonesForBonusIncrease = 50;
+      bonusIncrease = 2;
+      currentBonus = 3;
       break;
 
     default:
