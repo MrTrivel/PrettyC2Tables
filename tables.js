@@ -2,6 +2,7 @@
 var gSaveString;
 var gTable;
 var gTableRows;
+var gNeedProcessing = false;
 
 // Hardcoded data
 var altClassName = "alt";
@@ -12,8 +13,16 @@ function initializeGlobalVariables()
   gSaveString = document.getElementById("saveString");
 }
 
+function processingNeeded() {
+  gNeedProcessing = true;
+  setTimeout(function () {
+    doClick();
+  }, 1);
+}
 
-function doClick() {
+
+function doClick()
+{
 
   initializeGlobalVariables();
 
@@ -23,10 +32,12 @@ function doClick() {
   // Remove all the rows in the table
   clearTable();
 
+  gNeedProcessing = false;
+
   // Try to parse the save string
   var game;
   try {
-    game = JSON.parse(LZString.decompressFromBase64(saveString.value));
+    game = JSON.parse(LZString.decompressFromBase64(gSaveString.value));
   } catch(err) {}
 
   // If the data couldn't be parsed due to it not being a save string, throw errors
@@ -103,7 +114,8 @@ function calcChallenges(game, challengeData, hasMesmer, radHZReached)
   return totalC2Percent;
 }
 
-function getC2Percent(challenge, HZE, isMesmer) {
+function getC2Percent(challenge, HZE, isMesmer)
+{
 
   var zonesForBonus = 0; // zones needed for percentage increase
   var currentBonus = 0; // current percentage increases by
@@ -189,7 +201,8 @@ function getC2Percent(challenge, HZE, isMesmer) {
 }
 
 
-function getC2HZE(radiumHZE = 0){
+function getC2HZE(radiumHZE = 0)
+{
   var zone = 701;
   zone += (radiumHZE > 100) ? 100 + (Math.floor(radiumHZE / 50) * 10) : Math.floor(radiumHZE / 10) * 10;
   return zone;
