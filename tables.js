@@ -62,7 +62,7 @@ function doClick()
 
   // Initialize default challenges that are already available when unlocking C2 or C3
   var challengesU1 = ["Discipline", "Metal", "Size", "Balance", "Meditate"];
-  var challengesU2 = ["Unlucky", "Downsize", "Transmute", "Unbalance", "Duel", "Trappapalooza"];
+  var challengesU2 = ["Unlucky", "Downsize", "Transmute", "Unbalance", "Duel"];
 
   // Check if there are more basic C2s unlocked
   if (prisonClear >= 1) challengesU1.push("Electricity");
@@ -80,6 +80,7 @@ function doClick()
   if(totalC2 >= 4500) challengesU1.push("Eradicated");
 
   // Check if there are more C3s unlocked
+  if(radHZReached >= 59) challengesU2.push("Trappapalooza");
   if(radHZReached >= 69) challengesU2.push("Wither");
   if(radHZReached >= 84) challengesU2.push("Quest");
 
@@ -88,7 +89,7 @@ function doClick()
   var c2Percent = calcChallenges(game, challengesU1, hasMesmer, radHZReached);
   addRowToTable(["Total C<sup>2</sup>:", "", c2Percent + "%"]);
 
-  if (radHZReached >= 64)
+  if (radHZReached >= 49)
   {
     var c3Percent = calcChallenges(game, challengesU2, hasMesmer, radHZReached);
     addRowToTable(["Total C<sup>3</sup>:", "", c3Percent + "%"]);
