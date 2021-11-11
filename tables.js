@@ -7,22 +7,20 @@ var gNeedProcessing = false;
 // Hardcoded data
 var altClassName = "alt";
 
-function initializeGlobalVariables()
-{
+function initializeGlobalVariables() {
   gTable = document.getElementById("c2table");
   gSaveString = document.getElementById("saveString");
 }
 
 function processingNeeded() {
   gNeedProcessing = true;
-  setTimeout(function () {
+  setTimeout(function() {
     doClick();
   }, 1);
 }
 
 
-function doClick()
-{
+function doClick() {
 
   initializeGlobalVariables();
 
@@ -38,7 +36,7 @@ function doClick()
   var game;
   try {
     game = JSON.parse(LZString.decompressFromBase64(gSaveString.value));
-  } catch(err) {}
+  } catch (err) {}
 
   // If the data couldn't be parsed due to it not being a save string, throw errors
   if (game == null || game.talents == undefined) {
@@ -48,14 +46,13 @@ function doClick()
 
   // Game data needed for unlocks and calculations
   var hasMesmer = game.talents.mesmer.purchased;
-  var HZReached = game.global.highestLevelCleared+1;
+  var HZReached = game.global.highestLevelCleared + 1;
   var radHZReached = game.global.highestRadonLevelCleared;
   var prisonClear = game.global.prisonClear;
   var totalC2 = game.global.totalSquaredReward;
 
   // Check if C2s are even unlocked
-  if (HZReached < 65)
-  {
+  if (HZReached < 65) {
     addRowToTable(["C<sup>2</sup> has not", "been", "unlocked."]);
     return;
   }
@@ -66,42 +63,43 @@ function doClick()
 
   // Check if there are more basic C2s unlocked
   if (prisonClear >= 1) challengesU1.push("Electricity");
-  if(HZReached >= 130) challengesU1.push("Slow");
-  if(HZReached >= 145) challengesU1.push("Nom");
-  if(HZReached >= 150) challengesU1.push("Mapology");
-  if(HZReached >= 165) challengesU1.push("Toxicity");
-  if(HZReached >= 180) { challengesU1.push("Watch"); challengesU1.push("Lead"); }
-  if(HZReached >= 70) challengesU1.push("Trapper");
+  if (HZReached >= 130) challengesU1.push("Slow");
+  if (HZReached >= 145) challengesU1.push("Nom");
+  if (HZReached >= 150) challengesU1.push("Mapology");
+  if (HZReached >= 165) challengesU1.push("Toxicity");
+  if (HZReached >= 180) {
+    challengesU1.push("Watch");
+    challengesU1.push("Lead");
+  }
+  if (HZReached >= 70) challengesU1.push("Trapper");
 
   // Check if there are more special C2s unlocked
   challengesU1.push("Trimp"); // Already unlocked when having C2s unlocked
-  if(HZReached >= 120) challengesU1.push("Coordinate");
-  if(HZReached >= 425) challengesU1.push("Obliterated");
-  if(totalC2 >= 4500) challengesU1.push("Eradicated");
+  if (HZReached >= 120) challengesU1.push("Coordinate");
+  if (HZReached >= 425) challengesU1.push("Obliterated");
+  if (totalC2 >= 4500) challengesU1.push("Eradicated");
 
   // Check if there are more C3s unlocked
-  if(radHZReached >= 59) challengesU2.push("Trappapalooza");
-  if(radHZReached >= 69) challengesU2.push("Wither");
-  if(radHZReached >= 84) challengesU2.push("Quest");
-
-
+  if (radHZReached >= 59) challengesU2.push("Trappapalooza");
+  if (radHZReached >= 69) challengesU2.push("Wither");
+  if (radHZReached >= 84) challengesU2.push("Quest");
+  if (radHZReached >= 104) challengesU2.push("Storm");
+  if (radHZReached >= 114) challengesU2.push("Berserk");
+  
   // Calculate and add them to the table
   var c2Percent = calcChallenges(game, challengesU1, hasMesmer, radHZReached);
-  addRowToTable(["Total C<sup>2</sup>:", "", c2Percent + "%"]);
+  addRowToTable(["Total C<sup>2</sup>:", "", Math.min(c2Percent, 60000) + "%"]);
 
-  if (radHZReached >= 49)
-  {
+  if (radHZReached >= 49) {
     var c3Percent = calcChallenges(game, challengesU2, hasMesmer, radHZReached);
     addRowToTable(["Total C<sup>3</sup>:", "", c3Percent + "%"]);
     addRowToTable(["Total C<sup>∞</sup>:", "", Math.round(totalC2) + "%"]);
   }
 };
 
-function calcChallenges(game, challengeData, hasMesmer, radHZReached)
-{
+function calcChallenges(game, challengeData, hasMesmer, radHZReached) {
   var totalC2Percent = 0;
-  for (var i = 0 ; i < challengeData.length ; i++)
-  {
+  for (var i = 0; i < challengeData.length; i++) {
     var challenge = challengeData[i];
     if (game.c2[challenge] == "undefined") continue;
 
@@ -115,8 +113,7 @@ function calcChallenges(game, challengeData, hasMesmer, radHZReached)
   return totalC2Percent;
 }
 
-function getC2Percent(challenge, HZE, isMesmer)
-{
+function getC2Percent(challenge, HZE, isMesmer) {
 
   var zonesForBonus = 0; // zones needed for percentage increase
   var currentBonus = 0; // current percentage increases by
@@ -127,8 +124,7 @@ function getC2Percent(challenge, HZE, isMesmer)
   var currentZone = 0; // current zone
   var currentPercent = 0; // current C2 percentage
 
-  switch (challenge)
-  {
+  switch (challenge) {
     // U1 Cases
     case "Trimp":
       zonesForBonus = 10;
@@ -165,7 +161,7 @@ function getC2Percent(challenge, HZE, isMesmer)
       currentBonus = 10;
       break;
 
-    // U2 Cases
+      // U2 Cases
     case "Trappapalooza":
       zonesForBonus = 10;
       zonesForBonusIncrease = 50;
@@ -176,60 +172,53 @@ function getC2Percent(challenge, HZE, isMesmer)
     default:
       zonesForBonus = 10;
       zonesForBonusIncrease = 100;
-      bonusIncrease = isMesmer?3:1;
-      currentBonus = isMesmer?3:1;
+      bonusIncrease = isMesmer ? 3 : 1;
+      currentBonus = isMesmer ? 3 : 1;
       break;
   }
 
-  for (i = 0; i < Math.floor(HZE/zonesForBonus); i++)
-  {
+  for (i = 0; i < Math.floor(HZE / zonesForBonus); i++) {
     currentZone += zonesForBonus;
 
     var zonesAffected = currentZone - 701;
     var weirdBonus = 0;
-    if (zonesAffected > 0 && zonesAffected < zonesForBonus)
-    {
-      weirdBonus = 	Math.floor((currentBonus * (zonesForBonus-zonesAffected) +
-      currentBonus * 5 * zonesAffected) / zonesForBonus);
+    if (zonesAffected > 0 && zonesAffected < zonesForBonus) {
+      weirdBonus = Math.floor((currentBonus * (zonesForBonus - zonesAffected) +
+        currentBonus * 5 * zonesAffected) / zonesForBonus);
     }
 
 
     currentPercent += weirdBonus > 0 ? weirdBonus : currentBonus * (currentZone > 701 ? 5 : 1);
-    if (currentZone%zonesForBonusIncrease == 0) currentBonus += bonusIncrease;
+    if (currentZone % zonesForBonusIncrease == 0) currentBonus += bonusIncrease;
   }
 
   return currentPercent;
 }
 
 
-function getC2HZE(radiumHZE = 0)
-{
+function getC2HZE(radiumHZE = 0) {
   var zone = 701;
   zone += (radiumHZE > 100) ? 100 + (Math.floor(radiumHZE / 50) * 10) : Math.floor(radiumHZE / 10) * 10;
   return zone;
 }
 
-function clearTable()
-{
+function clearTable() {
   gTable.innerHTML = "";
   gTableRows = 0;
 }
 
-function addCellToRow(row, text, i, className)
-{
+function addCellToRow(row, text, i, className) {
   var cell = row.insertCell(i);
   cell.innerHTML = text;
   cell.className = className;
 }
 
-function addRowToTable(data)
-{
+function addRowToTable(data) {
   var row = gTable.insertRow(-1);
 
   gTableRows++;
 
-  for (var i = 0; i < data.length; i++)
-  {
+  for (var i = 0; i < data.length; i++) {
     addCellToRow(row, data[i], i, gTableRows % 2 == 0 ? altClassName : "");
   }
 }
