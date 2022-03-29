@@ -85,6 +85,7 @@ function doClick() {
   if (radHZReached >= 84) challengesU2.push("Quest");
   if (radHZReached >= 104) challengesU2.push("Storm");
   if (radHZReached >= 114) challengesU2.push("Berserk");
+  if (radHZReached >= 174) challengesU2.push("Glass");
   
   // Calculate and add them to the table
   var c2Percent = calcChallenges(game, challengesU1, hasMesmer, radHZReached);
